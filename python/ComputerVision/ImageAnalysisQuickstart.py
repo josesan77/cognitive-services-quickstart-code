@@ -41,11 +41,11 @@ from azure.cognitiveservices.vision.computervision.models import OperationStatus
 from azure.cognitiveservices.vision.computervision.models import VisualFeatureTypes, Details
 from msrest.authentication import CognitiveServicesCredentials
 
-from array import array
+#from array import array #seems to be unused
 import os
 from PIL import Image
-import sys
-import time
+# import sys #seems to be unused
+# import time #seems to be unused
 # </snippet_imports>
 
 '''
@@ -74,7 +74,11 @@ These variables are shared by several examples
 # Detect domain-specific content, Detect image types, Detect objects
 images_folder = os.path.join (os.path.dirname(os.path.abspath(__file__)), "images")
 # <snippet_remoteimage>
-remote_image_url = "https://moderatorsampleimages.blob.core.windows.net/samples/sample16.png"
+# Use the following image in agreement of the rules of Pixabay! Or use other publicly available  image.
+remote_image_url = "https://cdn.pixabay.com/photo/2024/01/04/21/54/volcano-8488486_640.jpg"
+# The service is not accessible for everyone to reach and use the previously defined image:
+# "https://moderatorsampleimages.blob.core.windows.net/samples/sample16.png"
+# Error: Image URL is not accessible. 
 # </snippet_remoteimage>
 '''
 END - Quickstart variables
@@ -133,7 +137,9 @@ END - Categorize an Image - local
 print("===== Analyze an image - remote =====")
 # Select the visual feature(s) you want.
 remote_image_features = [VisualFeatureTypes.categories,VisualFeatureTypes.brands,VisualFeatureTypes.adult,VisualFeatureTypes.color,VisualFeatureTypes.description,VisualFeatureTypes.faces,VisualFeatureTypes.image_type,VisualFeatureTypes.objects,VisualFeatureTypes.tags]
-remote_image_details = [Details.celebrities,Details.landmarks]
+remote_image_details = [Details.landmarks] #Details.celebrities option could be added, if ...
+# Authorization is granted. Process may require up to 10 days of feedback from 
+# https://aka.ms/celebrityrecognition
 # </snippet_features_remote>
 
 # <snippet_analyze>
