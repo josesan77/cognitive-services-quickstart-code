@@ -1,8 +1,10 @@
-'''
+"""
 Computer Vision Quickstart for Microsoft Azure Cognitive Services. 
 Uses local and remote images in each example.
 
 Prerequisites:
+    - Have or create an Azure Computer Vision service (key, endpoint) here: https://portal.azure.com/
+      follow this: https://learn.microsoft.com/en-us/azure/ai-services/computer-vision/quickstarts-sdk/image-analysis-client-library?tabs=windows%2Cvisual-studio&pivots=programming-language-python
     - Install the Computer Vision SDK:
       pip install --upgrade azure-cognitiveservices-vision-computervision
     - Install PIL:
@@ -32,12 +34,12 @@ References:
     - SDK: https://docs.microsoft.com/en-us/python/api/azure-cognitiveservices-vision-computervision/azure.cognitiveservices.vision.computervision?view=azure-python
     - Documentaion: https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/index
     - API: https://westus.dev.cognitive.microsoft.com/docs/services/computer-vision-v3-2/operations/5d986960601faab4bf452005
-'''
+"""
 
 # <snippet_imports_and_vars>
 # <snippet_imports>
 from azure.cognitiveservices.vision.computervision import ComputerVisionClient
-from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes
+#from azure.cognitiveservices.vision.computervision.models import OperationStatusCodes #seems to be unused
 from azure.cognitiveservices.vision.computervision.models import VisualFeatureTypes, Details
 from msrest.authentication import CognitiveServicesCredentials
 
@@ -162,8 +164,16 @@ if (len(results_remote.faces) == 0):
     print("No faces detected.")
 else:
     for face in results_remote.faces:
-        print("'{}' of age {} at location {}, {}, {}, {}".format(face.gender, face.age, \
-        face.face_rectangle.left, face.face_rectangle.top, \
+        if face.gender is not None and face.age is not None:
+            pretext = ("'{}' of age {}".format(face.gender, face.age))
+        elif face.age is not None:
+            pretext = ("age {}".format(face.age))
+        elif face.gender is not None:
+            pretext = ("'{}' ".format(face.gender))
+        else:
+            pretext = ('Gender, and age could not be determined')
+        print(pretext + " at location (left, top, right, bottom): {}, {}, {}, {}"\
+              .format( face.face_rectangle.left, face.face_rectangle.top, \
         face.face_rectangle.left + face.face_rectangle.width, \
         face.face_rectangle.top + face.face_rectangle.height))
 
@@ -219,8 +229,8 @@ print("Detecting objects in remote image:")
 if len(results_remote.objects) == 0:
     print("No objects detected.")
 else:
-    for object in detect_objects_results_remote.objects:
-        print("object at location {}, {}, {}, {}".format( \
+    for object in results_remote.objects: # fixed variable name error
+        print("object at location (left, right, top, bottom) {}, {}, {}, {}".format( \
         object.rectangle.x, object.rectangle.x + object.rectangle.w, \
         object.rectangle.y, object.rectangle.y + object.rectangle.h))
 
@@ -245,35 +255,37 @@ else:
         print("'{}' with confidence {:.2f}%".format(tag.name, tag.confidence * 100))
 
 # Detect celebrities
-print("Celebrities in the remote image:")
-if (len(results_remote.categories.detail.celebrities) == 0):
-    print("No celebrities detected.")
-else:
-    for celeb in results_remote.categories.detail.celebrities:
-        print(celeb["name"])
-
+# This module requires further authentication and access to 'Celebrity recognition' services. Ask for permission at:
+# https://aka.ms/celebrityrecognition
+# It may require up to 10 days of feedback.
+try:
+    print("Celebrities in the remote image:")
+    if (len(results_remote.categories.detail.celebrities) == 0):
+        print("No celebrities detected.")
+    else:
+        for celeb in results_remote.categories.detail.celebrities:
+            print(celeb["name"])
+except:
+    print('No celebrity information found')
+    
 # Detect landmarks
-print("Landmarks in the remote image:")
-if len(results_remote.categories.detail.landmarks) == 0:
-    print("No landmarks detected.")
-else:
-    for landmark in results_remote.categories.detail.landmarks:
-        print(landmark["name"])
-
+try:
+    print("Landmarks in the remote image:")
+    if len(results_remote.categories.detail.landmarks) == 0:
+        print("No landmarks detected.")
+    else:
+        for landmark in results_remote.categories.detail.landmarks:
+            print(landmark["name"])
+except: # in case results_remote.categories has no 'detail'
+    for category in results_remote.categories:
+        if category.__dict__['name']:
+            print(category.__dict__)
+            print('details: ' + ', '.join(category.detail.__dict__)) # property list
+            print(category.detail.__dict__) # property list with values (may be empty)
+        else:
+            print('No landmark recognised')
+    
 # </snippet_analyze>
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 '''
